@@ -1,4 +1,6 @@
+This project has been copied from:
+
 # SuperMario
 # YouTube Tutorials @ http://www.BrentAureli.com
 
-This version has been migrated to Maven
+Also, this version has been migrated to Maven.

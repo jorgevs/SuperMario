@@ -70,7 +70,7 @@ public class PlayScreen implements Screen{
         gamecam = new OrthographicCamera();
 
         //create a FitViewport to maintain virtual aspect ratio despite screen size
-        gamePort = new FitViewport(MarioBros.V_WIDTH / MarioBros.PPM, MarioBros.V_HEIGHT / MarioBros.PPM, gamecam);
+        gamePort = new FitViewport(MarioBros.WORLD_WIDTH / MarioBros.PPM, MarioBros.WORLD_HEIGHT / MarioBros.PPM, gamecam);
 
         //create our game HUD for scores/timers/level info
         hud = new Hud(game.batch);

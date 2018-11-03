@@ -7,8 +7,9 @@ import com.brentaureli.mariobros.MarioBros;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.width = 1200;
-		config.height = 624;
+		MarioBros marioBros = new MarioBros();
+		config.width = marioBros.WIDTH;
+		config.height = marioBros.HEIGHT;
 		new LwjglApplication(new MarioBros(), config);
 	}
 }
