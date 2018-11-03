@@ -3,6 +3,7 @@ package com.brentaureli.mariobros.Screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -32,14 +33,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * Created by brentaureli on 8/14/15.
  */
-public class PlayScreen implements Screen{
+public class PlayScreen extends ScreenAdapter {
     //Reference to our Game, used to set Screens
     private MarioBros game;
     private TextureAtlas atlas;
     public static boolean alreadyDestroyed = false;
 
     //basic playscreen variables
-    private OrthographicCamera gamecam;
     private Viewport gamePort;
     private Hud hud;
 
@@ -66,11 +66,9 @@ public class PlayScreen implements Screen{
         atlas = new TextureAtlas("Mario_and_Enemies.pack");
 
         this.game = game;
-        //create cam used to follow mario through cam world
-        gamecam = new OrthographicCamera();
 
         //create a FitViewport to maintain virtual aspect ratio despite screen size
-        gamePort = new FitViewport(MarioBros.WORLD_WIDTH / MarioBros.PPM, MarioBros.WORLD_HEIGHT / MarioBros.PPM, gamecam);
+        gamePort = new FitViewport(MarioBros.WORLD_WIDTH / MarioBros.PPM, MarioBros.WORLD_HEIGHT / MarioBros.PPM);
 
         //create our game HUD for scores/timers/level info
         hud = new Hud(game.batch);
@@ -81,7 +79,7 @@ public class PlayScreen implements Screen{
         renderer = new OrthogonalTiledMapRenderer(map, 1  / MarioBros.PPM);
 
         //initially set our gamcam to be centered correctly at the start of of map
-        gamecam.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 0);
+        gamePort.getCamera().position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 0);
 
         //create our Box2D world, setting no gravity in X, -10 gravity in Y, and allow bodies to sleep
         world = new World(new Vector2(0, -10), true);
@@ -108,7 +106,6 @@ public class PlayScreen implements Screen{
         itemsToSpawn.add(idef);
     }
 
-
     public void handleSpawningItems(){
         if(!itemsToSpawn.isEmpty()){
             ItemDef idef = itemsToSpawn.poll();
@@ -118,15 +115,8 @@ public class PlayScreen implements Screen{
         }
     }
 
-
     public TextureAtlas getAtlas(){
         return atlas;
-    }
-
-    @Override
-    public void show() {
-
-
     }
 
     public void handleInput(float dt){
@@ -167,16 +157,14 @@ public class PlayScreen implements Screen{
 
         //attach our gamecam to our players.x coordinate
         if(player.currentState != Mario.State.DEAD) {
-            gamecam.position.x = player.b2body.getPosition().x;
+            gamePort.getCamera().position.x = player.b2body.getPosition().x;
         }
 
         //update our gamecam with correct coordinates after changes
-        gamecam.update();
+        gamePort.getCamera().update();
         //tell our renderer to draw only what our camera can see in our game world.
-        renderer.setView(gamecam);
-
+        renderer.setView((OrthographicCamera)gamePort.getCamera());
     }
-
 
     @Override
     public void render(float delta) {
@@ -191,9 +179,9 @@ public class PlayScreen implements Screen{
         renderer.render();
 
         //renderer our Box2DDebugLines
-        b2dr.render(world, gamecam.combined);
+        b2dr.render(world, gamePort.getCamera().combined);
 
-        game.batch.setProjectionMatrix(gamecam.combined);
+        game.batch.setProjectionMatrix(gamePort.getCamera().combined);
         game.batch.begin();
         player.draw(game.batch);
         for (Enemy enemy : creator.getEnemies())
@@ -210,7 +198,6 @@ public class PlayScreen implements Screen{
             game.setScreen(new GameOverScreen(game));
             dispose();
         }
-
     }
 
     public boolean gameOver(){
@@ -235,21 +222,6 @@ public class PlayScreen implements Screen{
     }
 
     @Override
-    public void pause() {
-
-    }
-
-    @Override
-    public void resume() {
-
-    }
-
-    @Override
-    public void hide() {
-
-    }
-
-    @Override
     public void dispose() {
         //dispose of all our opened resources
         map.dispose();
@@ -259,5 +231,7 @@ public class PlayScreen implements Screen{
         hud.dispose();
     }
 
-    public Hud getHud(){ return hud; }
+    public Hud getHud(){
+        return hud;
+    }
 }
